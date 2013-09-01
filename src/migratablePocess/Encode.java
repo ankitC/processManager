@@ -9,6 +9,12 @@ public class Encode implements MigratableProcess{
 	public TransactionalInputStream inFile;
 	public TransactionalOutputStream outFile;
 	public boolean suspending;
+	
+	public Encode(String[] arguments){
+		inFile=new TransactionalInputStream(arguments[1]);
+		outFile= new TransactionalOutputStream(arguments[2]);
+	//	suspending=false;
+	}
 
 	public void run() {
 		// TODO Auto-generated method stub

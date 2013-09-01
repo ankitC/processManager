@@ -10,6 +10,12 @@ public class Decode implements MigratableProcess {
 	public TransactionalInputStream inFile;
 	public TransactionalOutputStream outFile;
 	public boolean suspending;
+	
+	public Decode(String[] arguments){
+		inFile=new TransactionalInputStream(arguments[1]);
+		outFile= new TransactionalOutputStream(arguments[2]);
+	//	suspending=false;
+	}
 
 	public void run() {
 		char c;
