@@ -1,24 +1,27 @@
 package migratablePocess;
 
 import java.io.IOException;
-import IO.TransactionalInputStream;
-import IO.TransactionalOutputStream;
+
+import IO.TransactionalFileInputStream;
+import IO.TransactionalFileOutputStream;
 
 public class Encode implements MigratableProcess{
 
-	public TransactionalInputStream inFile;
-	public TransactionalOutputStream outFile;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public TransactionalFileInputStream inFile;
+	public TransactionalFileOutputStream outFile;
 	public boolean suspending;
 	
 	public Encode(String[] arguments){
-		inFile=new TransactionalInputStream(arguments[1]);
-		outFile= new TransactionalOutputStream(arguments[2]);
-	//	suspending=false;
+		inFile=new TransactionalFileInputStream(arguments[1]);
+		outFile= new TransactionalFileOutputStream(arguments[2]);
 	}
 
 	public void run() {
-		// TODO Auto-generated method stub
-		char c;
+
 		suspending=false;
 		while(!suspending){
 
