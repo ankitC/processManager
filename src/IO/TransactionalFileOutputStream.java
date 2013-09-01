@@ -50,7 +50,7 @@ public class TransactionalFileOutputStream extends OutputStream implements
 		FileOutputStream fout = openFile();
 		byte[] writeByte = new byte[1];
 		writeByte[0] = (byte) b;
-		fout.write(writeByte, pos, 1);
+		fout.write(writeByte);
 		pos++;
 	}
 

@@ -6,7 +6,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import migratablePocess.MigratableProcess;
+import migratableProcess.*;
+
 
 public class MasterThread implements Runnable {
 
@@ -23,6 +24,7 @@ public class MasterThread implements Runnable {
 				arguments = input.split(" ");
 				if (arguments.length == 0)
 					continue;
+				System.out.println(arguments[0]);
 
 				if (arguments[0].equalsIgnoreCase("exit")) {
 					System.out.println("Exiting System.");
