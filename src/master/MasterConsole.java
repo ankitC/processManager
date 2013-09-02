@@ -1,15 +1,21 @@
 package master;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import migratableProcess.*;
+import utils.Message;
+
+import migratableProcess.MigratableProcess;
 
 
 public class MasterConsole implements Runnable {
+
+	public static int taskID=0;
 
 	public void run() {
 		BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -32,6 +38,7 @@ public class MasterConsole implements Runnable {
 
 				if(arguments[0].equalsIgnoreCase("cmd")){
 					handleCommand(arguments);
+					continue;
 				}
 
 				MigratableProcess task;
@@ -44,7 +51,26 @@ public class MasterConsole implements Runnable {
 				Object taskObject = new Object();
 				taskObject = (Object[]) arguments;
 				task = taskConstructor.newInstance(taskObject);
-				task.run();
+				//	task.run();
+				taskID++;
+				Master.pidToCommand.put(taskID,input);
+
+				/*Serialize the object*/
+				FileOutputStream file = new FileOutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
+				//	OutputStream outStrm=new OutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
+				ObjectOutputStream objectOutStrm=new ObjectOutputStream(file);
+				objectOutStrm.writeObject(task);
+				objectOutStrm.flush();
+				objectOutStrm.close();
+
+				int hostWorker=taskID%(Master.workers.size());
+				Message msg=new Message("run",taskID);
+
+				Master.pidToWorker.put(taskID, hostWorker);
+				Master.pidToStatus.put(taskID, "running");
+
+				MasterListener m=Master.workerToListner.get(hostWorker);
+				m.sendMessageToWorker(msg);
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -65,6 +91,8 @@ public class MasterConsole implements Runnable {
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
+			}catch (Exception e){
+				System.out.println("Exception Occured.");
 			}
 
 		}
@@ -93,9 +121,9 @@ public class MasterConsole implements Runnable {
 		if(arguments[1].equalsIgnoreCase("start")){
 
 		}
-		
+
 		if(arguments[1].equalsIgnoreCase("move")){
-			
+
 		}
 
 	}
