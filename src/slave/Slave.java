@@ -11,7 +11,8 @@ public class Slave {
 		int port =8081;
 		Socket slaveSocket=  new Socket(InetAddress.getByName(hostname), port);
 		System.out.println("Connected to the master");
-		  
+		
+	
 	}
 
 }
