@@ -1,6 +1,5 @@
 package IO;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,6 +7,10 @@ import java.io.Serializable;
 
 public class TransactionalFileOutputStream extends OutputStream implements
 		Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String fileName;
 	public int pos;
 
