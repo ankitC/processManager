@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import utils.Message;
+import utils.SerializeProcess;
 
 import migratableProcess.MigratableProcess;
 
@@ -56,12 +57,7 @@ public class MasterConsole implements Runnable {
 				Master.pidToCommand.put(taskID,input);
 
 				/*Serialize the object*/
-				FileOutputStream file = new FileOutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
-				//	OutputStream outStrm=new OutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
-				ObjectOutputStream objectOutStrm=new ObjectOutputStream(file);
-				objectOutStrm.writeObject(task);
-				objectOutStrm.flush();
-				objectOutStrm.close();
+				SerializeProcess.serializeProcess(taskID, task);
 
 				int hostWorker=taskID%(Master.workers.size());
 				Message msg=new Message("run",taskID);
