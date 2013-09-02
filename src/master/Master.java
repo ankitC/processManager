@@ -3,6 +3,7 @@ package master;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Master {
@@ -12,6 +13,9 @@ public class Master {
 	public static HashMap<Integer,String> pidToStatus=new HashMap<Integer,String>();
 	public static HashMap<Integer,String> pidToCommand=new HashMap<Integer, String>();
 	public static HashMap<Integer,MasterListener>workerToListner=new HashMap<Integer, MasterListener>();
+	
+	public static ArrayList<Integer>pid;
+	public static ArrayList<Integer> workers;
 	
 	public static int serverPort;
 	public static int workerNumber=0;
@@ -30,12 +34,15 @@ public class Master {
 		while (true){
 			Socket socket=servSocket.accept();
 			System.out.println("Connection established to"+ socket.getInetAddress()+":"+socket.getPort());
-			workerNumber++;
+						
+			workers.add(workerNumber);
 			workerToSocket.put(workerNumber, socket);
+			
 			MasterListener m=new MasterListener(socket, workerNumber);
 			workerToListner.put(workerNumber, m);
 			Thread listenerThread=new Thread(m);
 			listenerThread.start();
+			workerNumber++;
 		}
 	}
 }
