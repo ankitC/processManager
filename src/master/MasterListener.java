@@ -1,12 +1,8 @@
 package master;
 
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
-
 
 import utils.Message;
 
@@ -24,11 +20,10 @@ public class MasterListener implements Runnable {
 
 	}
 
-	private void sendMessageToSlave(Message msg) {
+	public void sendMessageToWorker(Message msg) {
 		OutputStream outputStrm;
 		ObjectOutputStream objectOutStrm;
-		InputStream inputStrm; 
-		ObjectInputStream objectInStrm;
+
 		try {
 			outputStrm     =  mSock.getOutputStream();
 			objectOutStrm = new ObjectOutputStream(outputStrm);
