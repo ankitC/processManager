@@ -18,18 +18,19 @@ public class processManager {
 		
 		if(args.length==2){
 		
-			if(args[0].equals("-c")){
-				System.out.println("-c detected / hostname:"+args[1]);
+			if(args[0].equals("-s")){
+				System.out.println("-s detected / hostname:"+args[1]);
 				System.out.println("I am a slave");
 				Slave.runSlave(args[1]);
 			}
 			else
-				System.out.println("Invalid Argument; use -c for slave mode");
+				System.out.println("Invalid Argument; use -s for slave mode");
 		}
 		else if(args.length>2 || args.length==1)
-			System.out.println("Error: usage processmanager / processmanager -c  <hostname>");
+			System.out.println("Error: usage processmanager / processmanager -s  <hostname>");
 		else{
 			System.out.println("I am a master");
+			Master.serverPort=8081;
 			Master.runMaster();
 		}
 
