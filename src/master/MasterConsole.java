@@ -1,17 +1,14 @@
 package master;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import migratableProcess.MigratableProcess;
 import utils.Message;
 import utils.SerializeProcess;
-
-import migratableProcess.MigratableProcess;
 
 
 public class MasterConsole implements Runnable {
@@ -24,7 +21,7 @@ public class MasterConsole implements Runnable {
 		String[] arguments;
 
 		while (true) {
-			System.out.print("-->");
+			System.out.print("Master-->");
 			try {
 				input = console.readLine();
 				arguments = input.split(" ");
@@ -52,21 +49,21 @@ public class MasterConsole implements Runnable {
 				Object taskObject = new Object();
 				taskObject = (Object[]) arguments;
 				task = taskConstructor.newInstance(taskObject);
-				//	task.run();
-				taskID++;
+							
 				Master.pidToCommand.put(taskID,input);
 
 				/*Serialize the object*/
 				SerializeProcess.serializeProcess(taskID, task);
 
 				int hostWorker=taskID%(Master.workers.size());
-				Message msg=new Message("run",taskID);
+				Message msg=new Message("start",taskID);
 
 				Master.pidToWorker.put(taskID, hostWorker);
 				Master.pidToStatus.put(taskID, "running");
 
 				MasterListener m=Master.workerToListner.get(hostWorker);
 				m.sendMessageToWorker(msg);
+				taskID++;
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -101,25 +98,53 @@ public class MasterConsole implements Runnable {
 			if(arguments[2].equalsIgnoreCase("nodes")){
 				System.out.println("Nodes");
 				/*Print all available nodes*/
-				System.out.println();
+				System.out.println(Master.workers.toString());
+				return;
 			}
 			if(arguments[2].equalsIgnoreCase("ps")){
 				System.out.println("Current Processes");
 				/*show processes*/
 				System.out.println();
+				return;
 			}
 		}
 
 		if(arguments[1].equalsIgnoreCase("suspend")){
-
+			int pid=Integer.valueOf(arguments[2]);
+			if(Master.pid.contains(pid)){
+				if(Master.pidToStatus.get(pid).equalsIgnoreCase("running")){
+					Message m=new Message("suspend", pid);
+					MasterListener listener=Master.workerToListner.get(Master.pidToWorker.get(pid));
+					listener.sendMessageToWorker(m);
+					Master.pidToStatus.put(pid, "suspended");
+				}else{
+					System.out.println("Process Already suspended on node:"+Master.pidToWorker.get(pid));
+				}
+			}else{
+				System.out.println("Invalid ProcessID");
+			}
+			return;
 		}
 
 		if(arguments[1].equalsIgnoreCase("start")){
-
+			int pid=Integer.valueOf(arguments[2]);
+			if(Master.pid.contains(pid)){
+				if(Master.pidToStatus.get(pid).equalsIgnoreCase("suspended")){
+					Message m=new Message("start", pid);
+					MasterListener listener=Master.workerToListner.get(Master.pidToWorker.get(pid));
+					listener.sendMessageToWorker(m);
+					Master.pidToStatus.put(pid, "running");
+				}else{
+					System.out.println("Process Already running on node:"+Master.pidToWorker.get(pid));
+				}
+			}else{
+				System.out.println("Invalid ProcessID");
+			}
+			return;
 		}
 
 		if(arguments[1].equalsIgnoreCase("move")){
-
+			return;
 		}
 
 	}
