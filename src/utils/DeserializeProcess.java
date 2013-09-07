@@ -13,7 +13,7 @@ public class DeserializeProcess {
 	public static MigratableProcess deSerializeProcess(int pid){
 		FileInputStream file;
 		try {
-			file = new FileInputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(pid)+".ser");
+			file = new FileInputStream(Config.serializeDirectory+Integer.toString(pid)+".ser");
 	
 		//	OutputStream outStrm=new OutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
 		ObjectInputStream objectInStrm=new ObjectInputStream(file);

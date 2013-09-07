@@ -11,7 +11,7 @@ public class SerializeProcess {
 	public static void serializeProcess(int pid, MigratableProcess task){
 		FileOutputStream file;
 		try {
-			file = new FileOutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(pid)+".ser");
+			file = new FileOutputStream(Config.serializeDirectory+Integer.toString(pid)+".ser");
 	
 		//	OutputStream outStrm=new OutputStream("/afs/ece/usr/achheda/ds/workspace/lab1/"+Integer.toString(taskID)+".ser");
 		ObjectOutputStream objectOutStrm=new ObjectOutputStream(file);
