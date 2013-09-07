@@ -80,6 +80,7 @@ public class Master {
 				/*Serialize the object*/
 				utils.SerializeProcess.serializeProcess(taskID, task);
 				Master.suspendedPid.add(taskID);
+				Master.pidToStatus.put(taskID, "suspended");
 				System.out.println("New task "+taskID+" added to the suspended list");
 				taskID++;
 
@@ -165,14 +166,15 @@ public class Master {
 			System.out.println("pid:"+pid);
 			int worker=Integer.valueOf(arguments[3]);
 			System.out.println("worker:"+worker);
+			
 			if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
 				if(Master.pidToStatus.get(pid).equalsIgnoreCase("suspended")){
 					if(Master.workers.contains(worker)){
-
+						
 						Message m=new Message("start", pid);
 						MasterListener listener=Master.workerToListner.get(worker);
 						listener.sendMessageToWorker(m);
-
+						
 						Master.suspendedPid.remove(pid);
 						Master.runningPid.add(pid);
 						Master.pidToStatus.put(pid, "running");
