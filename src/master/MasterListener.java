@@ -13,6 +13,7 @@ public class MasterListener implements Runnable {
 	public int forWorker;
 
 	public MasterListener(Socket mSock, int forWorker){
+		System.out.println("Making a new Master listener");
 		this.mSock=mSock;
 		this.forWorker=forWorker;
 	}
@@ -20,6 +21,7 @@ public class MasterListener implements Runnable {
 	public void run() {
 		/*Monitor the inputStream for communication with the Worker*/
 	try {
+		//System.out.println("Started a new listener");
 		ObjectInputStream objInput=new ObjectInputStream(mSock.getInputStream());
 		Message inMsg;
 		while(true){
@@ -27,11 +29,21 @@ public class MasterListener implements Runnable {
 			inMsg=(Message)incomingMsg;
 			System.out.println("Message Received");
 			if(inMsg.command.equalsIgnoreCase("done")){
-				System.out.println("pid:"+inMsg.pid+" Done!");
-				Master.pid.remove(inMsg.pid);
-				Master.pidToCommand.remove(inMsg.pid);
-				Master.pidToStatus.remove(inMsg.pid);
+				
+			if(Master.runningPid.contains(inMsg.pid)){
+				System.out.println("Process "+inMsg.pid+" completed!");
+				Master.runningPid.remove(inMsg.pid);
 				Master.pidToWorker.remove(inMsg.pid);
+			}
+			
+			if(Master.suspendedPid.contains(inMsg.pid)){
+				System.out.println("Process "+inMsg.pid+" suspended!");
+				Master.pidToWorker.remove(inMsg.pid);
+			}
+			
+		//		Master.pidToCommand.remove(inMsg.pid);
+		//		Master.pidToStatus.remove(inMsg.pid);
+				
 			}
 			
 			
@@ -48,6 +60,7 @@ public class MasterListener implements Runnable {
 		
 	}
 
+	
 	public void sendMessageToWorker(Message msg) {
 		OutputStream outputStrm;
 		ObjectOutputStream objectOutStrm;
