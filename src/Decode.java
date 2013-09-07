@@ -41,7 +41,7 @@ public class Decode implements MigratableProcess {
 				int asciiLetter=Integer.parseInt(letter.toString(), 16) ;
 				outFile.write(asciiLetter);
 				
-				Thread.sleep(500);
+				Thread.sleep(3000);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -56,7 +56,14 @@ public class Decode implements MigratableProcess {
 
 	public void suspend() {
 		suspending=true;
-		while(suspending);
+		while(suspending){
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 

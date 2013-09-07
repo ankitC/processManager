@@ -43,7 +43,7 @@ public class Encode implements MigratableProcess{
 				for(int i=0; i<b.length;i++)
 					outFile.write((int)b[i]);
 				
-				Thread.sleep(500);
+				Thread.sleep(3000);
 
 
 			}catch (IOException e) {
@@ -63,7 +63,7 @@ public class Encode implements MigratableProcess{
 		suspending=true;
 		while(suspending){
 			try {
-				Thread.sleep(100);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
