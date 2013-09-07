@@ -53,8 +53,7 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 
 	@Override
 	public String toString() {
-		return "TransactionalInputStream [fileName=" + fileName + ", pos="
-				+ pos + "]";
+		return "TransactionalInputStream [fileName=" + fileName + ", pos="+ pos + "]";
 	}
 	
 }

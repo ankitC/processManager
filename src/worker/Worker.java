@@ -30,7 +30,7 @@ public class Worker {
 	public static void runWorker(String hostname) throws UnknownHostException, IOException{
 		int port =8081;
 		workerSocket=  new Socket(InetAddress.getByName(hostname), port);
-		System.out.println("Connected to the master");
+	//	System.out.println("Connected to the master");
 
 		objInput=new ObjectInputStream(workerSocket.getInputStream());
 		objOut=new ObjectOutputStream(workerSocket.getOutputStream());
@@ -43,10 +43,11 @@ public class Worker {
 			try {
 				Object incomingMsg=objInput.readObject();
 				inMsg=(Message)incomingMsg;
-				System.out.println("Message Received");
+				System.out.println("Message Received: "+inMsg.command+ "  "+ inMsg.pid);
 				
 				if(inMsg.command.equalsIgnoreCase("start")){
 					MigratableProcess mProc=utils.DeserializeProcess.deSerializeProcess(inMsg.pid);
+					System.out.println("Deserializing process");
 					pidToMigratableProcess.put(inMsg.pid, mProc);
 					System.out.println("Starting Process"+inMsg.pid);
 					runningProcess.add(inMsg.pid);
