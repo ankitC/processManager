@@ -1,36 +1,33 @@
-
-
 import java.io.IOException;
 
-import migratableProcess.MigratableProcess;
-
-import IO.TransactionalFileInputStream;
-import IO.TransactionalFileOutputStream;
-
-public class Decode implements MigratableProcess {
+public class Decode extends MigratableProcess {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	public TransactionalFileInputStream inFile;
 	public TransactionalFileOutputStream outFile;
-	public boolean suspending;
 	
 	public Decode(String[] arguments){
-		inFile=new TransactionalFileInputStream(arguments[1]);
+        super(arguments);
+        inFile=new TransactionalFileInputStream(arguments[1]);
 		outFile= new TransactionalFileOutputStream(arguments[2]);
 	}
 
 	public void run() {
 
-		suspending=false;
-		while(!suspending){
+        running = true;
+		suspended = false;
+		while(!suspended){
 			try {
 				int a=inFile.read();
 				int b=inFile.read();
 
-				if(a==-1||b==-1)
-					break;
+				if(a==-1||b==-1) {
+                    done = true;
+                    break;
+                }
+
 				char first=(char)a;
 				char second=(char)b;
 				
@@ -51,12 +48,13 @@ public class Decode implements MigratableProcess {
 				e.printStackTrace();
 			}
 		}
-		suspending=false;
+		suspended = false;
 	}
 
 	public void suspend() {
-		suspending=true;
-		while(suspending){
+
+		suspended = true;
+		while(suspended){
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {

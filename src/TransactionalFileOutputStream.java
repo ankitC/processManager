@@ -1,18 +1,12 @@
-package IO;
+import java.io.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
-
-public class TransactionalFileOutputStream extends OutputStream implements
-		Serializable {
+public class TransactionalFileOutputStream extends OutputStream implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public String fileName;
-	public int pos;
+	private String fileName;
+	private int pos;
 
 	public TransactionalFileOutputStream(String fileName) {
 		super();
@@ -42,20 +36,21 @@ public class TransactionalFileOutputStream extends OutputStream implements
 				+ pos + "]";
 	}
 
-	private FileOutputStream openFile() throws IOException {
-		FileOutputStream fs = new FileOutputStream(fileName, true);
+	private RandomAccessFile openFile() throws IOException {
+		RandomAccessFile fs = new RandomAccessFile(fileName, "rws");
+        fs.seek(pos);
 		return fs;
 	}
 
 	@Override
 	public void write(int b) throws IOException {
 		// TODO Auto-generated method stub
-		FileOutputStream fout = openFile();
-		byte[] writeByte = new byte[1];
-		writeByte[0] = (byte) b;
-		fout.write(writeByte);
-		fout.flush();
-		fout.close();
+		RandomAccessFile fout = openFile();
+		//byte[] writeByte = new byte[1];
+		//writeByte[0] = (byte) b;
+		//fout.write(writeByte);
+        fout.write(b);
+        fout.close();
 		pos++;
 	}
 
