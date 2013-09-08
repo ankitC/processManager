@@ -1,5 +1,11 @@
+package Migratable;
+
 import java.io.Serializable;
 
+/**
+ * Abstract representation of a process that can be suspended, moved,
+ * and resumed seamlessly.
+ */
 public abstract class MigratableProcess implements Runnable, Serializable {
 
     protected int pid;

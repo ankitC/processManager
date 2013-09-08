@@ -1,10 +1,16 @@
+package Migratable;
+
+import IO.TransactionalFileInputStream;
+import IO.TransactionalFileOutputStream;
+
 import java.io.IOException;
 
+/**
+ * Given a file containing characters, outputs a file containing
+ * the ASCII representation of each character in the input file
+ */
 public class Encode extends MigratableProcess{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public TransactionalFileInputStream inFile;
 	public TransactionalFileOutputStream outFile;

@@ -1,5 +1,13 @@
+package IO;
+
+import Migratable.MigratableProcess;
+import Config.Config;
+
 import java.io.*;
 
+/**
+ * Responsible for serializing and deserializing a {@link MigratableProcess}.
+ */
 public class Marshaller {
 
     public static void serialize(MigratableProcess task){

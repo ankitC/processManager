@@ -1,13 +1,16 @@
+package IO;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
+/**
+ * Implementation of InputStream that keeps track of how far in a file
+ * it has accessed in order to use a new InputStream for every read operation.
+ */
 public class TransactionalFileInputStream extends InputStream implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String fileName;
 	private int pos;

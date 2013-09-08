@@ -1,8 +1,13 @@
+package Master;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 
+/**
+ * Responsible for managing incoming {@link Worker.Worker} connections.
+ */
 public class MasterConnectionHandler implements Runnable {
 
     private Master master;
@@ -10,14 +15,8 @@ public class MasterConnectionHandler implements Runnable {
 
     private int workerID = 0;
 
-    /*List of current Process IDs and workers*/
-    //public static ArrayList<Integer> runningPid=new ArrayList<Integer>();
-    //public static ArrayList<Integer> suspendedPid=new ArrayList<Integer>();
-    //public static ArrayList<Integer> workers=new ArrayList<Integer>();
-
-
     public MasterConnectionHandler(Master master) {
-        System.out.println("Making a new MasterConnectionHandler");
+        System.out.println("Making a new Master.MasterConnectionHandler");
         this.master = master;
         workers = master.getWorkerToSocket();
     }

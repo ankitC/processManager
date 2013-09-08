@@ -1,5 +1,13 @@
+package Message;
+
+import Migratable.MigratableProcess;
+
 import java.io.Serializable;
 
+/**
+ * <p>Responsible for informing a master the {@link Status} of a particular {@link MigratableProcess}.
+ * <p>Notice that this message is sent FROM a {@link Worker} TO a {@link Master}.</p>
+ */
 public class WorkerMessage implements Serializable {
     /**
      *

@@ -1,3 +1,12 @@
+package Master;
+
+import Config.Config;
+import IO.Marshaller;
+import Message.Command;
+import Message.MasterMessage;
+import Message.Status;
+import Migratable.MigratableProcess;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,9 +16,13 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Master.Master server responsible for controlling process creation and delegation.
+ * Presents users with a command-line interface.
+ */
 public class Master implements Runnable {
 
-    //private HashMap<Integer, MigratableProcess> pidToProcess;
+    //private HashMap<Integer, Migratable.MigratableProcess> pidToProcess;
 
     private Map<Integer, Status> pidToStatus = new ConcurrentHashMap<Integer, Status>();
     private Map<Integer, Integer> pidToWorker = new ConcurrentHashMap<Integer,Integer>();
@@ -35,7 +48,7 @@ public class Master implements Runnable {
 		String[] arguments;
 
 		while (true) {
-			System.out.print("Master-->");
+			System.out.print("Master.Master-->");
 			try {
 				input = console.readLine();
 				arguments = input.split(" ");
@@ -43,7 +56,8 @@ public class Master implements Runnable {
 					continue;
 				System.out.println(arguments[0]);
 
-				if (arguments[0].equalsIgnoreCase("exit")) {
+				/*Exit*/
+                if (arguments[0].equalsIgnoreCase("exit")) {
 					System.out.println("Exiting System.");
 					System.exit(0);
 				}
@@ -62,8 +76,6 @@ public class Master implements Runnable {
 				Constructor<MigratableProcess> processConstructor =
                         (Constructor<MigratableProcess>) (processClass.getConstructor(String[].class));
 
-				//Object taskObject = new Object();
-				//taskObject = (Object[]) arguments;
 				task = processConstructor.newInstance((Object) arguments);
                 task.setPid(pid);
 
@@ -77,7 +89,7 @@ public class Master implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				System.out.println("Requested class does not exist: Try 'Encode <infile> <outfile>' or 'Decode <infile> <outfile> ");
+				System.out.println("Requested class does not exist: Try 'Migratable.Encode <infile> <outfile>' or 'Migratable.Decode <infile> <outfile> ");
 			//	e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 				System.out.println("No Constructor written! Write it!!!");
@@ -101,6 +113,12 @@ public class Master implements Runnable {
 		}
 	}
 
+    /**
+     * Given the command-line user input, attempts to parse it
+     * into one of several pre-defined commands
+     * @param arguments
+     *      arguments for one of several pre-defined commands
+     */
 	public void handleCommand(String[] arguments){
 
 		/*handle a list command*/
@@ -137,26 +155,6 @@ public class Master implements Runnable {
 		/*Handle suspend command*/
 		if(arguments[1].equalsIgnoreCase("suspend")){
 			int pid=Integer.valueOf(arguments[2]);
-			/*if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
-				if(Master.pidToStatus.get(pid).equalsIgnoreCase("running")){
-
-					MasterMessage m=new MasterMessage("suspend", pid);
-					MasterCommunicator listener=Master.workerToListner.get(Master.pidToWorker.get(pid));
-					listener.sendMessageToWorker(m);
-
-
-					Master.suspendedPid.add(pid);
-					Master.runningPid.remove(pid);
-					Master.pidToStatus.put(pid, "suspended");
-					Master.pidToWorker.remove(pid);
-
-				}else{
-					System.out.println("Process Already suspended");
-				}
-			}else{
-				System.out.println("Invalid ProcessID");
-			}
-			return;*/
             if (pidToStatus.get(pid) != null) {
                 if (pidToStatus.get(pid).equals(Status.RUNNING)) {
                     MasterMessage m =new MasterMessage(Command.SUSPEND, pid);
@@ -199,37 +197,10 @@ public class Master implements Runnable {
             } else {
                 System.out.println("Invalid process ID");
             }
-
-			/*if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
-				if(Master.pidToStatus.get(pid).equalsIgnoreCase("suspended")){
-					if(Master.workers.contains(worker)){
-
-						MasterMessage m=new MasterMessage("start", pid);
-						MasterCommunicator listener=Master.workerToListner.get(worker);
-						listener.sendMessageToWorker(m);
-
-						Master.suspendedPid.remove(pid);
-						Master.runningPid.add(pid);
-						Master.pidToStatus.put(pid, "running");
-						Master.pidToWorker.put(pid, worker);
-					}else{
-						System.out.println("Specified worker does not exist");
-					}
-				}else{
-					System.out.println("Process Already running on node:"+Master.pidToWorker.get(pid));
-				}
-			}else{
-				System.out.println("Invalid ProcessID");
-			}
-			return;*/
 		}
 
 
 	}
-
-    /*public HashMap<Integer, MigratableProcess> getPidToProcess() {
-        return pidToProcess;
-    }*/
 
     public Map<Integer, Status> getPidToStatus() {
         return pidToStatus;

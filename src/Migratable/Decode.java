@@ -1,9 +1,17 @@
+package Migratable;
+
+import IO.TransactionalFileInputStream;
+import IO.TransactionalFileOutputStream;
+
 import java.io.IOException;
 
+/**
+ * Given a file containing ASCII characters encoded from
+ * some message of characters, decodes the file into the original
+ * characters.
+ */
 public class Decode extends MigratableProcess {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	public TransactionalFileInputStream inFile;
 	public TransactionalFileOutputStream outFile;

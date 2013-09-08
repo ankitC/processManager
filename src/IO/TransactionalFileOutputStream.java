@@ -1,9 +1,13 @@
+package IO;
+
 import java.io.*;
 
+/**
+ * Implementation of OutputStream that keeps track of how far in a file
+ * it has accessed in order to use a new OutputStream for every write operation.
+ */
 public class TransactionalFileOutputStream extends OutputStream implements Serializable {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private String fileName;
 	private int pos;
