@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import migratableProcess.MigratableProcess;
 import utils.Message;
@@ -21,8 +22,8 @@ public class Master {
 	public static HashMap<Integer,MasterListener>workerToListner=new HashMap<Integer, MasterListener>();
 
 	/*List of current Process IDs and workers*/
-	public static ArrayList<Integer>runningPid=new ArrayList<Integer>();
-	public static ArrayList<Integer> suspendedPid=new ArrayList<Integer>();
+	public static HashSet<Integer>runningPid=new HashSet<Integer>();
+	public static HashSet<Integer> suspendedPid=new HashSet<Integer>();
 	public static ArrayList<Integer> workers=new ArrayList<Integer>();
 
 	public static int taskID=0;
