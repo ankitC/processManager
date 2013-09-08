@@ -30,17 +30,14 @@ public class Worker {
 	public static void runWorker(String hostname) throws UnknownHostException, IOException{
 		int port =8081;
 		workerSocket=  new Socket(InetAddress.getByName(hostname), port);
-	//	System.out.println("Connected to the master");
-
-		objInput=new ObjectInputStream(workerSocket.getInputStream());
-		objOut=new ObjectOutputStream(workerSocket.getOutputStream());
-		
-		
 		
 		Message inMsg;
 		
 		while(true){
 			try {
+				objInput=new ObjectInputStream(workerSocket.getInputStream());
+				objOut=new ObjectOutputStream(workerSocket.getOutputStream());
+				System.out.println("Awaiting object");
 				Object incomingMsg=objInput.readObject();
 				inMsg=(Message)incomingMsg;
 				System.out.println("Message Received: "+inMsg.command+ "  "+ inMsg.pid);
@@ -55,6 +52,7 @@ public class Worker {
 					Thread t=new Thread(mProc);
 					t.start();
 					processThread.add(t);
+					System.out.println("Added process to the list");
 				}
 				
 				if(inMsg.command.equalsIgnoreCase("suspend")){
@@ -66,6 +64,9 @@ public class Worker {
 					pidToMigratableProcess.remove(inMsg.pid);
 					
 				}
+				
+				objInput.close();
+				objOut.close();
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
