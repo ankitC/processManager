@@ -1,10 +1,8 @@
 package utils;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import migratableProcess.MigratableProcess;
 
@@ -20,6 +18,7 @@ public class DeserializeProcess {
 		Object o=objectInStrm.readObject();
 		MigratableProcess m=(MigratableProcess)o;
 		objectInStrm.close();
+		file.close();
 		return m;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

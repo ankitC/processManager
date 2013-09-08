@@ -67,6 +67,7 @@ public class Master {
 				/*Starts off a Migratable Process*/
 				MigratableProcess task;
 
+				@SuppressWarnings("unchecked")
 				Class<MigratableProcess> taskClass = (Class<MigratableProcess>) (Class
 						.forName(arguments[0]));
 				Constructor<MigratableProcess> taskConstructor = (Constructor<MigratableProcess>) (taskClass
@@ -174,6 +175,10 @@ public class Master {
 						
 						Message m=new Message("start", pid);
 						MasterListener listener=Master.workerToListner.get(worker);
+						System.out.println("Sending message to worker");
+						System.out.println("Hello");
+						System.out.println("listner Object=" + listener.toString());
+						System.out.flush();
 						listener.sendMessageToWorker(m);
 						
 						Master.suspendedPid.remove(pid);

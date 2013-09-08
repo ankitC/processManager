@@ -18,10 +18,12 @@ public class SerializeProcess {
 		objectOutStrm.writeObject(task);
 		objectOutStrm.flush();
 		objectOutStrm.close();
+		file.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 }
