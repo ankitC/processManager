@@ -38,6 +38,11 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 		fs.skip(pos);
 		return fs;
 	}
+	
+	public void close(){
+		
+		
+	}
 
 	@Override
 	public int read() throws IOException {
@@ -47,6 +52,7 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 		
 		if(returnVal>-1)
 			pos=pos+1;
+		fin.close();
 		
 		return returnVal;
 	}
