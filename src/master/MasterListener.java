@@ -9,7 +9,7 @@ import java.net.Socket;
 import utils.Message;
 
 public class MasterListener implements Runnable {
-	public Socket mSock;
+	public Socket mSock=new Socket();
 	public int forWorker;
 
 	public MasterListener(Socket mSock, int forWorker){
@@ -72,6 +72,7 @@ public class MasterListener implements Runnable {
 			objectOutStrm.flush();
 			outputStrm.close();
 			objectOutStrm.close();
+			outputStrm.close();
 		} catch (Exception e) {
 			System.err.println("Command not sent");
 

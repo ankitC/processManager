@@ -48,7 +48,6 @@ public class Worker {
 					pidToMigratableProcess.put(inMsg.pid, mProc);
 					System.out.println("Starting Process"+inMsg.pid);
 					runningProcess.add(inMsg.pid);
-					//WorkerThread w=new WorkerThread(mProc, inMsg.pid);
 					Thread t=new Thread(mProc);
 					t.start();
 					processThread.add(t);
@@ -85,6 +84,7 @@ public class Worker {
 			objectOutStrm.flush();
 			outputStrm.close();
 			objectOutStrm.close();
+			outputStrm.close();
 		} catch (Exception e) {
 			System.err.println("Command not sent");
 		}
