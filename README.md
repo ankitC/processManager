@@ -1,39 +1,43 @@
-ProcessManager:
+Lab 1: Migratable Process
 
-Make a jar for eg. processManager.jar
+Ankit Chheda (achheda) and Vinay Balaji(vbalaji)
 
-To start the master:
-
-java -jar processManager.jar
-
-
-To start the worker:
-
-java -jar processManager.jar -s <IP/hostname of the master>
+Brief:
+Process Migration framework enables to move work around to worker nodes. You can start work on the master console and then move it to any node using console commands.
 
 
-On the master, a console is shown like:
+1. High-Level Design Description:
 
-Master-> <enter your commands here>
+When you run the master, a master console interacts with the admin controlling the execution. A 'MasterConnectionAcceptor' is monitoring for the incoming connections from the workers. Whenever a worker node connects to a master, a 'MasterListener' is instantiated to communicate with the worker node.
 
-Available commands:
+A bunch of workers on other machinces using <program.jar> -s <master hostname>. Whenever a worker node is started, it starts of a main thread which monitors for the incoming messages from the master. Another thread is responsible for monitoring that all the work being assigned to the master is being done.
 
-cmd ls nodes ->lists the nodes
-cmd ls ps -> lists the running and suspended processes
+The admin starts a process from the console. It can then direct the process to the node using :
+"cmd start <processID> <nodeID>" 
 
-Encode <path to input file> <path to the output file> ->Create a migratable process of class Encode
-Decode <path to input file> <path to output file> ->Create a migratable process of class Decode
+A process that is started can be suspended using: 
+"cmd suspend <processID>" 
 
-start <processid> <nodeid> -> starts the process "processid" on node "nodeid"
-suspend <processid> -> suspends the particular processid
+The process can again be started using "cmd start <processID> <nodeID>".
 
-Testing done:
+The nodes can be listed using 
+"cmd ls nodes"
 
-Master node comes up.
-Worker nodes come up and connect to the master.
-Process gets created and serialized
+A list of running and suspended processes is obtained by 
+"cmd ls ps"
 
-Tests now to be done:
-start command
-suspend command
+Migratable Processes:
 
+Encode <infile>  <outfile>
+
+This process takes the input file and encodes into output file which can be decoded by the the Decode class included. The encoding process can be suspended by calling the suspend(). It can again be resumed on any node.
+
+Decode <infile> <outfile>
+
+Takes in a encoded 'infile' and decodes it to get the original text content back to the 'outfile'. The decoding process can also be suspended using the suspend(). It can again be started using "cmd start <processID> <nodeID>"
+
+
+Assumptions:
+We assume that once the worker node joins in; it shall not leave.
+The infile for the migratable process are always present.
+The configuration parameters are set in the config file which will describe the location where all the processes are serialized.
