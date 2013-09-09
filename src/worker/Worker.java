@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import migratableProcess.MigratableProcess;
 import utils.Message;
@@ -22,8 +23,8 @@ public class Worker {
 	public static HashMap<Integer, Thread>pidToThread=new HashMap<Integer, Thread>();
 
 
-	public static ArrayList<Integer> runningProcess=new ArrayList<Integer>();
-	public static ArrayList<Thread> processThread=new ArrayList<Thread>();
+	public static HashSet<Integer> runningProcess=new HashSet<Integer>();
+	//public static ArrayList<Thread> processThread=new ArrayList<Thread>();
 	
 	private static void workerInit(String hostname){
 		int port =8081;
@@ -65,17 +66,17 @@ public class Worker {
 					runningProcess.add(inMsg.pid);
 					Thread t=new Thread(mProc);
 					t.start();
-					processThread.add(t);
+					pidToThread.put(inMsg.pid, t);
 					System.out.println("Added process to the list");
 				}
 
 				if(inMsg.command.equalsIgnoreCase("suspend")){
 					MigratableProcess mProc=pidToMigratableProcess.get(inMsg.pid);
 					mProc.suspend();
-					runningProcess.remove(inMsg.pid);
+					//runningProcess.remove(inMsg.pid);
 					System.out.println("Serializing process"+inMsg.pid);
 					utils.SerializeProcess.serializeProcess(inMsg.pid, mProc);
-					pidToMigratableProcess.remove(inMsg.pid);
+					//pidToMigratableProcess.remove(inMsg.pid);
 				}
 
 

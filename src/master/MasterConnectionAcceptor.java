@@ -24,7 +24,7 @@ public class MasterConnectionAcceptor implements Runnable {
 			//	System.out.println("Connection established to"+ socket.getInetAddress()+":"+socket.getPort());
 
 				Master.workers.add(workerNumber);
-				Master.workerToSocket.put(workerNumber, socket);
+//				Master.workerToSocket.put(workerNumber, socket);
 
 				MasterListener m=new MasterListener(socket, workerNumber);
 				Master.workerToListner.put(workerNumber, m);

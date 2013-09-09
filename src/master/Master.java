@@ -15,10 +15,10 @@ import utils.Message;
 
 public class Master {
 
-	public static HashMap<Integer, Socket> workerToSocket=new HashMap<Integer,Socket>();
+	//public static HashMap<Integer, Socket> workerToSocket=new HashMap<Integer,Socket>();
 	public static HashMap<Integer,Integer> pidToWorker=new HashMap<Integer,Integer>();
 	public static HashMap<Integer,String> pidToStatus=new HashMap<Integer,String>();
-	public static HashMap<Integer,String> pidToCommand=new HashMap<Integer, String>();
+	//public static HashMap<Integer,String> pidToCommand=new HashMap<Integer, String>();
 	public static HashMap<Integer,MasterListener>workerToListner=new HashMap<Integer, MasterListener>();
 
 	/*List of current Process IDs and workers*/
@@ -36,7 +36,7 @@ public class Master {
 		Thread connAccThread=new Thread(mca);
 		connAccThread.start();
 		System.out.println("Now accepting connections");
-		
+
 		/*Starts off the console*/
 		System.out.println("Initializing Console");
 
@@ -63,7 +63,7 @@ public class Master {
 					handleCommand(arguments);
 					continue;
 				}
-				
+
 				/*Starts off a Migratable Process*/
 				MigratableProcess task;
 
@@ -77,7 +77,7 @@ public class Master {
 				taskObject = (Object[]) arguments;
 				task = taskConstructor.newInstance(taskObject);
 
-				Master.pidToCommand.put(taskID,input);
+		//		Master.pidToCommand.put(taskID,input);
 
 				/*Serialize the object*/
 				utils.SerializeProcess.serializeProcess(taskID, task);
@@ -90,7 +90,7 @@ public class Master {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				System.out.println("Requested class does not exist: Try 'Encode <infile> <outfile>' or 'Decode <infile> <outfile> ");
-			//	e.printStackTrace();
+				//	e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 				System.out.println("No Constructor written! Write it!!!");
 				e.printStackTrace();
@@ -98,7 +98,7 @@ public class Master {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
 				System.out.println("Could not instantiate an object of the requested class.");
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
@@ -114,7 +114,7 @@ public class Master {
 	}
 
 	private static void handleCommand(String[] arguments){
-		
+
 		/*handle a list command*/
 		if(arguments[1].equalsIgnoreCase("ls")){
 			if(arguments[2].equalsIgnoreCase("nodes")){
@@ -136,7 +136,7 @@ public class Master {
 				return;
 			}
 		}
-		
+
 		/*Handle suspend command*/
 		if(arguments[1].equalsIgnoreCase("suspend")){
 			int pid=Integer.valueOf(arguments[2]);
@@ -161,18 +161,18 @@ public class Master {
 			}
 			return;
 		}
-		
+
 		/*handle a start command*/
 		if(arguments[1].equalsIgnoreCase("start")){
 			int pid=Integer.valueOf(arguments[2]);
 			System.out.println("pid:"+pid);
 			int worker=Integer.valueOf(arguments[3]);
 			System.out.println("worker:"+worker);
-			
+
 			if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
 				if(Master.pidToStatus.get(pid).equalsIgnoreCase("suspended")){
 					if(Master.workers.contains(worker)){
-						
+
 						Message m=new Message("start", pid);
 						MasterListener listener=Master.workerToListner.get(worker);
 						System.out.println("Sending message to worker");
@@ -180,7 +180,7 @@ public class Master {
 						System.out.println("listner Object=" + listener.toString());
 						System.out.flush();
 						listener.sendMessageToWorker(m);
-						
+
 						Master.suspendedPid.remove(pid);
 						Master.runningPid.add(pid);
 						Master.pidToStatus.put(pid, "running");
@@ -196,12 +196,7 @@ public class Master {
 			}
 			return;
 		}
-
-
 	}
-
-
-
 }
 
 
