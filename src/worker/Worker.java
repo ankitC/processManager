@@ -1,105 +1,115 @@
 package worker;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+
+import master.MasterMessage;
 import migratableProcess.MigratableProcess;
-import utils.Message;
+
+import common.Config;
+import common.Marshaller;
 
 public class Worker {
+    private Socket workerSocket;
+    private ObjectInputStream objInput;
+    private ObjectOutputStream objOut;
 
-	public static Socket workerSocket;
-	public static ObjectInputStream objIn;
-	public static ObjectOutputStream objOut;
+    private Map<Integer, MigratableProcess> pidToMigratableProcess = new ConcurrentHashMap<Integer, MigratableProcess>();
+    private Map<Integer, Thread> pidToThread = new ConcurrentHashMap<Integer, Thread>();
 
-	public static HashMap<Integer, MigratableProcess> pidToMigratableProcess=new HashMap<Integer, MigratableProcess>();
-	public static HashMap<Integer, Thread>pidToThread=new HashMap<Integer, Thread>();
+    public HashSet<Integer> getRunningPids() {
+        return runningPids;
+    }
 
+    private HashSet<Integer> runningPids = new HashSet<Integer>();
 
-	public static HashSet<Integer> runningProcess=new HashSet<Integer>();
-	//public static ArrayList<Thread> processThread=new ArrayList<Thread>();
-	
-	private static void workerInit(String hostname){
-		int port =8081;
-		try {
-			workerSocket=  new Socket(InetAddress.getByName(hostname), port);
-			objOut=new ObjectOutputStream(workerSocket.getOutputStream());
-			objOut.flush();
-			objIn=new ObjectInputStream(workerSocket.getInputStream());
-			
-			
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+    public void run(String hostname) throws IOException {
 
+        WorkerMonitor monitor = new WorkerMonitor(this);
+        new Thread(monitor).start();
 
-	public static void runWorker(String hostname) throws UnknownHostException, IOException{
-		
-		workerInit(hostname);
-		Message inMsg;
-		while(true){
+        int port = Config.serverPort;
+        workerSocket =  new Socket(InetAddress.getByName(hostname), port);
+        System.out.println("Connected to the master");
 
-			try {
-				System.out.println("Awaiting object");
-				Object incomingMsg=objIn.readObject();
-				inMsg=(Message)incomingMsg;
-				System.out.println("Message Received: "+inMsg.command+ "  "+ inMsg.pid);
+        MasterMessage inMsg;
 
-				if(inMsg.command.equalsIgnoreCase("start")){
-					MigratableProcess mProc=utils.DeserializeProcess.deSerializeProcess(inMsg.pid);
-					System.out.println("Deserializing process");
-					pidToMigratableProcess.put(inMsg.pid, mProc);
-					System.out.println("Starting Process"+inMsg.pid);
-					runningProcess.add(inMsg.pid);
-					Thread t=new Thread(mProc);
-					t.start();
-					pidToThread.put(inMsg.pid, t);
-					System.out.println("Added process to the list");
-				}
+        while(true){
+            try {
+                if (objInput == null) {
+                    objInput = new ObjectInputStream(workerSocket.getInputStream());
+                }
+                //objOut = new ObjectOutputStream(workerSocket.getOutputStream());
+                //objOut=new ObjectOutputStream(workerSocket.getOutputStream());
+                Object incomingMsg=objInput.readObject();
+                //objInput.close();
+                inMsg=(MasterMessage)incomingMsg;
+                System.out.println("MasterMessage Received: "+inMsg.getCommand()+ "  "+ inMsg.getPid());
 
-				if(inMsg.command.equalsIgnoreCase("suspend")){
-					MigratableProcess mProc=pidToMigratableProcess.get(inMsg.pid);
-					mProc.suspend();
-					//runningProcess.remove(inMsg.pid);
-					System.out.println("Serializing process"+inMsg.pid);
-					utils.SerializeProcess.serializeProcess(inMsg.pid, mProc);
-					//pidToMigratableProcess.remove(inMsg.pid);
-				}
+                int pid = inMsg.getPid();
+                MigratableProcess mProc;
 
+                switch (inMsg.getCommand()) {
+                    case START:
+                        mProc = Marshaller.deserialize(pid);
+                        System.out.println("Deserializing process");
+                        pidToMigratableProcess.put(pid, mProc);
+                        runningPids.add(pid);
+                        System.out.println("Starting Process " + pid);
+                        Thread t=new Thread(mProc);
+                        pidToThread.put(pid, t);
+                        t.start();
+                        break;
+                    case SUSPEND:
+                        mProc = pidToMigratableProcess.get(pid);
+                        mProc.suspend();
+                        runningPids.remove(pid);
+                        System.out.println("Serializing process " + pid);
+                        Marshaller.serialize(mProc);
+                        //pidToMigratableProcess.remove(pid);
+                        //pidToThread.remove(pid);
+                        break;
+                }
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+    public void sendMessageToMaster(WorkerMessage msg){
+        OutputStream outputStrm;
+        ObjectOutputStream objectOutStrm;
 
-	}
+        try {
+            if (objOut == null) {
+                objOut = new ObjectOutputStream(workerSocket.getOutputStream());
+            }
+            objectOutStrm = objOut;
+            objectOutStrm.writeObject(msg);
+            objectOutStrm.flush();
+            //objectOutStrm.reset();
+            //outputStrm.close();
+            //objectOutStrm.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Command not sent");
+        }
 
-	public static void sendMessageToMaster(Message msg){
-		try {
-			
-			objOut.writeObject(msg);
-			objOut.flush();
-			//outputStrm.close();
-			//	objectOutStrm.close();
+    }
 
-		} catch (Exception e) {
-			System.err.println("Command not sent");
-		}
+    public Map<Integer, MigratableProcess> getPidToMigratableProcess() {
+        return pidToMigratableProcess;
+    }
 
-	}
+    public Map<Integer, Thread> getPidToThread() {
+        return pidToThread;
+    }
 }
-

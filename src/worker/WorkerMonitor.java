@@ -1,30 +1,65 @@
 package worker;
 
-import java.util.Iterator;
+import java.util.Map;
 
-public class WorkerMonitor {
 
-	public static void monitorWork(){
+import migratableProcess.MigratableProcess;
+
+import common.Status;
+
+public class WorkerMonitor implements Runnable {
+
+    private Worker worker;
+
+    public WorkerMonitor(Worker worker) {
+        this.worker = worker;
+    }
+
+	public void run(){
 		while(true){
-			Iterator<Integer> runningProcs=Worker.runningProcess.iterator();
-			while(runningProcs.hasNext()){
-				int pid=runningProcs.next();
-				Thread t=Worker.pidToThread.get(pid);
+
+			/*for(Map.Entry<Integer, Thread> e : worker.getPidToThread().entrySet()){
+                Integer pid = e.getKey();
+                Thread t = e.getValue();
 				try {
 					t.join(100);
 					if(!t.isAlive()){
-						Worker.runningProcess.remove(pid);
-						Worker.pidToMigratableProcess.remove(pid);
-						Worker.pidToThread.remove(pid);
-						//Worker.processThread.remove(t);
+                        worker.getPidToMigratableProcess().remove(pid);
+                        worker.getPidToThread().remove(pid);
+
+                        worker.sendMessageToMaster(new WorkerMessage(Status.DONE, pid));
 						System.out.println("Finished process "+pid);
-					}
-				} catch (InterruptedException e) {
+					} else if (worker.getRunningPids().contains(pid)) {
+                        worker.sendMessageToMaster(new WorkerMessage(Status.RUNNING, pid));
+                    } else {
+                        worker.sendMessageToMaster(new WorkerMessage(Status.SUSPENDED, pid));
+                    }
+				} catch (InterruptedException ex) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					ex.printStackTrace();
 				}
-			}
-		}
+			}*/
+            for (Map.Entry<Integer, MigratableProcess> e : worker.getPidToMigratableProcess().entrySet()) {
+                Integer pid = e.getKey();
+                MigratableProcess mProc = e.getValue();
+                if (mProc.isDone()) {
+                    worker.getPidToMigratableProcess().remove(pid);
+                    worker.getPidToThread().remove(pid);
+                    worker.sendMessageToMaster(new WorkerMessage(Status.DONE, pid));
+                    System.out.println("Finished process "+pid);
+                } /*else if (mProc.isSuspended()) {
+                    worker.sendMessageToMaster(new WorkerMessage(Status.SUSPENDED, pid));
+                } else if (mProc.isRunning()) {
+                    worker.sendMessageToMaster(new WorkerMessage(Status.RUNNING, pid));
+                }*/
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
 }

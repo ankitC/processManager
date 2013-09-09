@@ -1,5 +1,10 @@
 import java.io.IOException;
 
+import migratableProcess.MigratableProcess;
+
+import transactionalIO.TransactionalFileInputStream;
+import transactionalIO.TransactionalFileOutputStream;
+
 public class Encode extends MigratableProcess{
 
 	/**

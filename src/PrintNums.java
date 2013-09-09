@@ -1,3 +1,5 @@
+import migratableProcess.MigratableProcess;
+
 public class PrintNums extends MigratableProcess{
 
     /**

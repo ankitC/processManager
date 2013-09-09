@@ -6,34 +6,33 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import migratableProcess.MigratableProcess;
-import utils.Message;
 
-public class Master {
+import common.Command;
+import common.Config;
+import common.Marshaller;
+import common.Status;
 
-	//public static HashMap<Integer, Socket> workerToSocket=new HashMap<Integer,Socket>();
-	public static HashMap<Integer,Integer> pidToWorker=new HashMap<Integer,Integer>();
-	public static HashMap<Integer,String> pidToStatus=new HashMap<Integer,String>();
-	//public static HashMap<Integer,String> pidToCommand=new HashMap<Integer, String>();
-	public static HashMap<Integer,MasterListener>workerToListner=new HashMap<Integer, MasterListener>();
+public class Master implements Runnable {
 
-	/*List of current Process IDs and workers*/
-	public static HashSet<Integer>runningPid=new HashSet<Integer>();
-	public static HashSet<Integer> suspendedPid=new HashSet<Integer>();
-	public static ArrayList<Integer> workers=new ArrayList<Integer>();
+    //private HashMap<Integer, MigratableProcess> pidToProcess;
 
-	public static int taskID=0;
+    private Map<Integer, Status> pidToStatus = new ConcurrentHashMap<Integer, Status>();
+    private Map<Integer, Integer> pidToWorker = new ConcurrentHashMap<Integer,Integer>();
+    private Map<Integer, Socket> workerToSocket = new ConcurrentHashMap<Integer,Socket>();
+    private Map<Integer, MasterCommunicator> workerToCommunicator = new ConcurrentHashMap<Integer, MasterCommunicator>();
+	private int pid =0;
 
+    private int port = Config.serverPort;
 
-	public static void runMaster() throws IOException{
+	public void run() {
 
-		MasterConnectionAcceptor mca=new MasterConnectionAcceptor();
+		MasterConnectionHandler mch = new MasterConnectionHandler(this);
 		/*Start off a thread that monitors incoming connections*/
-		Thread connAccThread=new Thread(mca);
+		Thread connAccThread=new Thread(mch);
 		connAccThread.start();
 		System.out.println("Now accepting connections");
 
@@ -67,30 +66,28 @@ public class Master {
 				/*Starts off a Migratable Process*/
 				MigratableProcess task;
 
-				@SuppressWarnings("unchecked")
-				Class<MigratableProcess> taskClass = (Class<MigratableProcess>) (Class
-						.forName(arguments[0]));
-				Constructor<MigratableProcess> taskConstructor = (Constructor<MigratableProcess>) (taskClass
-						.getConstructor(String[].class));
+				Class<MigratableProcess> processClass =
+                        (Class<MigratableProcess>) (Class.forName(arguments[0]));
+				Constructor<MigratableProcess> processConstructor =
+                        (Constructor<MigratableProcess>) (processClass.getConstructor(String[].class));
 
-				Object taskObject = new Object();
-				taskObject = (Object[]) arguments;
-				task = taskConstructor.newInstance(taskObject);
-
-		//		Master.pidToCommand.put(taskID,input);
+				//Object taskObject = new Object();
+				//taskObject = (Object[]) arguments;
+				task = processConstructor.newInstance((Object) arguments);
+                task.setPid(pid);
 
 				/*Serialize the object*/
-				utils.SerializeProcess.serializeProcess(taskID, task);
-				Master.suspendedPid.add(taskID);
-				Master.pidToStatus.put(taskID, "suspended");
-				System.out.println("New task "+taskID+" added to the suspended list");
-				taskID++;
+				Marshaller.serialize(task);
+
+                pidToStatus.put(pid, Status.SUSPENDED);
+
+				pid++;
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				System.out.println("Requested class does not exist: Try 'Encode <infile> <outfile>' or 'Decode <infile> <outfile> ");
-				//	e.printStackTrace();
+			//	e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 				System.out.println("No Constructor written! Write it!!!");
 				e.printStackTrace();
@@ -98,7 +95,7 @@ public class Master {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
 				System.out.println("Could not instantiate an object of the requested class.");
-				//e.printStackTrace();
+				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
@@ -113,38 +110,47 @@ public class Master {
 		}
 	}
 
-	private static void handleCommand(String[] arguments){
+	public void handleCommand(String[] arguments){
 
 		/*handle a list command*/
 		if(arguments[1].equalsIgnoreCase("ls")){
 			if(arguments[2].equalsIgnoreCase("nodes")){
 				System.out.println("Nodes:");
 				/*Print all available nodes*/
-				System.out.println(Master.workers.toString());
+				System.out.println(workerToSocket.keySet().toString());
 				return;
 			}
 			if(arguments[2].equalsIgnoreCase("ps")){
 				System.out.println("Current Processes");
 				/*show processes*/
 				System.out.println("Running processes:");
-				System.out.println(Master.runningPid.toString());
+
+                for (Map.Entry<Integer, Status> e : pidToStatus.entrySet()) {
+                    if (e.getValue().equals(Status.RUNNING)) {
+                        System.out.println(e.getKey());
+                    }
+                }
 
 				System.out.println();
 
 				System.out.println("Suspended processes:");
-				System.out.println(Master.suspendedPid.toString());
-				return;
+
+                for (Map.Entry<Integer, Status> e : pidToStatus.entrySet()) {
+                    if (e.getValue().equals(Status.SUSPENDED)) {
+                        System.out.println(e.getKey());
+                    }
+                }
 			}
 		}
 
 		/*Handle suspend command*/
 		if(arguments[1].equalsIgnoreCase("suspend")){
 			int pid=Integer.valueOf(arguments[2]);
-			if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
+			/*if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
 				if(Master.pidToStatus.get(pid).equalsIgnoreCase("running")){
 
-					Message m=new Message("suspend", pid);
-					MasterListener listener=Master.workerToListner.get(Master.pidToWorker.get(pid));
+					MasterMessage m=new MasterMessage("suspend", pid);
+					MasterCommunicator listener=Master.workerToListner.get(Master.pidToWorker.get(pid));
 					listener.sendMessageToWorker(m);
 
 
@@ -159,7 +165,21 @@ public class Master {
 			}else{
 				System.out.println("Invalid ProcessID");
 			}
-			return;
+			return;*/
+            if (pidToStatus.get(pid) != null) {
+                if (pidToStatus.get(pid).equals(Status.RUNNING)) {
+                    MasterMessage m =new MasterMessage(Command.SUSPEND, pid);
+                    MasterCommunicator listener= workerToCommunicator.get(pidToWorker.get(pid));
+                    listener.sendMessageToWorker(m);
+
+                    pidToStatus.put(pid, Status.SUSPENDED);
+                    pidToWorker.remove(pid);
+                } else {
+                    System.out.println("That process is not currently running");
+                }
+            } else {
+                System.out.println("Invalid process ID");
+            }
 		}
 
 		/*handle a start command*/
@@ -169,16 +189,32 @@ public class Master {
 			int worker=Integer.valueOf(arguments[3]);
 			System.out.println("worker:"+worker);
 
-			if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
+            if (pidToStatus.get(pid) != null) {
+                if (pidToStatus.get(pid).equals(Status.SUSPENDED)) {
+                    if(workerToCommunicator.get(worker) != null){
+
+                        MasterMessage m=new MasterMessage(Command.START, pid);
+                        MasterCommunicator listener = workerToCommunicator.get(worker);
+                        listener.sendMessageToWorker(m);
+
+                        pidToStatus.put(pid, Status.RUNNING);
+                        pidToWorker.put(pid, worker);
+                    }else{
+                        System.out.println("Specified worker does not exist");
+                    }
+                } else {
+                    System.out.println("That process is already running");
+                }
+            } else {
+                System.out.println("Invalid process ID");
+            }
+
+			/*if(Master.runningPid.contains(pid)||Master.suspendedPid.contains(pid)){
 				if(Master.pidToStatus.get(pid).equalsIgnoreCase("suspended")){
 					if(Master.workers.contains(worker)){
 
-						Message m=new Message("start", pid);
-						MasterListener listener=Master.workerToListner.get(worker);
-						System.out.println("Sending message to worker");
-						System.out.println("Hello");
-						System.out.println("listner Object=" + listener.toString());
-						System.out.flush();
+						MasterMessage m=new MasterMessage("start", pid);
+						MasterCommunicator listener=Master.workerToListner.get(worker);
 						listener.sendMessageToWorker(m);
 
 						Master.suspendedPid.remove(pid);
@@ -194,9 +230,35 @@ public class Master {
 			}else{
 				System.out.println("Invalid ProcessID");
 			}
-			return;
+			return;*/
 		}
+
+
 	}
+
+    /*public HashMap<Integer, MigratableProcess> getPidToProcess() {
+        return pidToProcess;
+    }*/
+
+    public Map<Integer, Status> getPidToStatus() {
+        return pidToStatus;
+    }
+
+    public Map<Integer, Integer> getPidToWorker() {
+        return pidToWorker;
+    }
+
+    public Map<Integer, Socket> getWorkerToSocket() {
+        return workerToSocket;
+    }
+
+    public Map<Integer, MasterCommunicator> getWorkerToCommunicator() {
+        return workerToCommunicator;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }
 
 
