@@ -1,5 +1,3 @@
-package IO;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +9,8 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public String fileName;
-	public int pos;
+	private String fileName;
+	private int pos;
 
 	public TransactionalFileInputStream(String fileName) {
 		super();
@@ -38,21 +36,16 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 		fs.skip(pos);
 		return fs;
 	}
-	
-	public void close(){
-		
-		
-	}
 
 	@Override
 	public int read() throws IOException {
 		// TODO Auto-generated method stub
 		FileInputStream fin=openFile();
 		int returnVal=fin.read();
+        fin.close();
 		
 		if(returnVal>-1)
 			pos=pos+1;
-		fin.close();
 		
 		return returnVal;
 	}
