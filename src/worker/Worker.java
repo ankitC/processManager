@@ -76,6 +76,9 @@ public class Worker {
                         //pidToMigratableProcess.remove(pid);
                         //pidToThread.remove(pid);
                         break;
+                    case EXIT:
+                    	System.out.println("Exit received from master");
+                    	System.exit(1);
                 }
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block

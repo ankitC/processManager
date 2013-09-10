@@ -3,11 +3,17 @@ package master;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import worker.WorkerMessage;
 
 import migratableProcess.MigratableProcess;
 
@@ -48,11 +54,20 @@ public class Master implements Runnable {
 			try {
 				input = console.readLine();
 				arguments = input.split(" ");
-				if (arguments.length == 0)
-					continue;
-				System.out.println(arguments[0]);
+				
+				//System.out.println(arguments[0]);
 
 				if (arguments[0].equalsIgnoreCase("exit")) {
+					System.out.println("Closing all workers.");
+					
+					MasterCommunicator communicator;
+					MasterMessage exitMessage=new MasterMessage(Command.EXIT, 0);
+					Set<Integer> workers= workerToCommunicator.keySet();
+					Iterator<Integer> workerIterator=workers.iterator();
+					while(workerIterator.hasNext()){
+						communicator=workerToCommunicator.get(workerIterator.next());
+						communicator.sendMessageToWorker(exitMessage);
+					}
 					System.out.println("Exiting System.");
 					System.exit(0);
 				}
@@ -60,6 +75,22 @@ public class Master implements Runnable {
 				/*Handles the command to list nodes or processes, start them and suspend them*/
 				if(arguments[0].equalsIgnoreCase("cmd")){
 					handleCommand(arguments);
+					continue;
+				}
+				
+				if(arguments[0].equalsIgnoreCase("")){
+					continue;
+					
+				}
+				
+				if(arguments[0].equalsIgnoreCase("help")){
+					System.out.println("Commands:");
+					System.out.println("cmd ls nodes");
+					System.out.println("cmd ls ps");
+					System.out.println("");
+					System.out.println("Processes:");
+					System.out.println("Encode <infile> <outfile>");
+					System.out.println("Decode  <infile> <outfile>");
 					continue;
 				}
 
