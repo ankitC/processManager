@@ -8,5 +8,5 @@ public class Config {
     public static int workerPort=9091;
 	
 	/*Directory where the processes will be serialzed to*/
-	public static String  serializeDirectory="/afs/andrew.cmu.edu/usr21/vbalaji/private/15440/hw1";
+	public static String  serializeDirectory="/afs/ece.cmu.edu/usr/achheda/ds/processManager/";
 }
