@@ -3,7 +3,8 @@ import java.io.Serializable;
 
 public abstract class MigratableProcess implements Runnable, Serializable {
 
-    protected int pid;
+	private static final long serialVersionUID = -4043477201906251170L;
+	protected int pid;
     protected boolean running;
     protected boolean suspended;
     protected boolean done;
@@ -13,7 +14,7 @@ public abstract class MigratableProcess implements Runnable, Serializable {
         suspended = false;
         done = false;
     }
-
+    
     public void setPid(int pid) {
         this.pid = pid;
     }
@@ -38,4 +39,7 @@ public abstract class MigratableProcess implements Runnable, Serializable {
     public abstract void run();
 
     public abstract void suspend();
+
+    public abstract String toString();
+
 }

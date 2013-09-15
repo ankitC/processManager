@@ -3,11 +3,9 @@ package master;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import worker.WorkerMessage;
-
 
 import common.Status;
 
@@ -65,7 +63,6 @@ public class MasterCommunicator implements Runnable {
 
 	
 	public void sendMessageToWorker(MasterMessage msg) {
-		OutputStream outputStrm;
 		ObjectOutputStream objectOutStrm;
 
 		try {
@@ -75,16 +72,9 @@ public class MasterCommunicator implements Runnable {
 			objectOutStrm = objOut;
 			objectOutStrm.writeObject(msg);
 			objectOutStrm.flush();
-            //objectOutStrm.reset();
-			//outputStrm.close();
-			//objectOutStrm.close();
-		} catch (Exception e) {
+ 		} catch (Exception e) {
             e.printStackTrace();
 			System.err.println("Command not sent");
-
 		}
-
 	}
-
-
 }

@@ -3,17 +3,13 @@ package master;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import worker.WorkerMessage;
 
 import migratableProcess.MigratableProcess;
 
@@ -68,7 +64,9 @@ public class Master implements Runnable {
 						communicator=workerToCommunicator.get(workerIterator.next());
 						communicator.sendMessageToWorker(exitMessage);
 					}
+					
 					System.out.println("Exiting System.");
+					
 					System.exit(0);
 				}
 
@@ -97,6 +95,7 @@ public class Master implements Runnable {
 				/*Starts off a Migratable Process*/
 				MigratableProcess task;
 
+				@SuppressWarnings("unchecked")
 				Class<MigratableProcess> processClass =
                         (Class<MigratableProcess>) (Class.forName(arguments[0]));
 				Constructor<MigratableProcess> processConstructor =
