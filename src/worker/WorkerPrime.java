@@ -15,7 +15,7 @@ import migratableProcess.MigratableProcess;
 import common.Config;
 import common.Marshaller;
 
-public class Worker {
+public class WorkerPrime {
 	private Socket workerSocket;
 	private ObjectInputStream objInput;
 	private ObjectOutputStream objOut;

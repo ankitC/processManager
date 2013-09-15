@@ -1,7 +1,7 @@
 package main;
 import java.io.IOException;
 
-import worker.Worker;
+import worker.WorkerPrime;
 
 import master.Master;
 
@@ -16,7 +16,7 @@ public class Main {
                 System.out.println("-s detected / hostname:"+args[1]);
                 System.out.println("I am a worker");
 				/*start the worker node*/
-                Worker worker = new Worker();
+                WorkerPrime worker = new WorkerPrime();
                 worker.run(args[1]);
             }
             else

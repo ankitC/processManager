@@ -6,9 +6,9 @@ import common.Status;
 
 public class WorkerMonitor implements Runnable {
 
-    private Worker worker;
+    private WorkerPrime worker;
 
-    public WorkerMonitor(Worker worker) {
+    public WorkerMonitor(WorkerPrime worker) {
         this.worker = worker;
     }
 
