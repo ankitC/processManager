@@ -12,12 +12,6 @@ public class MasterConnectionHandler implements Runnable {
 
     private int workerID = 0;
 
-    /*List of current Process IDs and workers*/
-    //public static ArrayList<Integer> runningPid=new ArrayList<Integer>();
-    //public static ArrayList<Integer> suspendedPid=new ArrayList<Integer>();
-    //public static ArrayList<Integer> workers=new ArrayList<Integer>();
-
-
     public MasterConnectionHandler(Master master) {
         System.out.println("Making a new MasterConnectionHandler");
         this.master = master;
