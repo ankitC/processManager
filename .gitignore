@@ -4,3 +4,6 @@
 .DS_STORE
 .idea/*
 *.iml
+.settings/*
+.project
+.classpath
