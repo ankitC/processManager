@@ -6,9 +6,6 @@ import java.io.Serializable;
 
 public class TransactionalFileInputStream extends InputStream implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String fileName;
 	private int pos;
@@ -31,7 +28,7 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 	public void setPos(int pos) {
 		this.pos = pos;
 	}
-	
+
 	private FileInputStream openFile() throws IOException {
 		FileInputStream fs = new FileInputStream(fileName);
 		fs.skip(pos);
@@ -40,14 +37,14 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 
 	@Override
 	public int read() throws IOException {
-		// TODO Auto-generated method stub
+
 		FileInputStream fin=openFile();
 		int returnVal=fin.read();
-        fin.close();
-		
+		fin.close();
+
 		if(returnVal>-1)
 			pos=pos+1;
-		
+
 		return returnVal;
 	}
 
@@ -55,5 +52,4 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 	public String toString() {
 		return "TransactionalInputStream [fileName=" + fileName + ", pos="+ pos + "]";
 	}
-	
 }

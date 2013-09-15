@@ -39,20 +39,16 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 
 	private RandomAccessFile openFile() throws IOException {
 		RandomAccessFile fs = new RandomAccessFile(fileName, "rws");
-        fs.seek(pos);
+		fs.seek(pos);
+		pos++;
 		return fs;
 	}
 
 	@Override
 	public void write(int b) throws IOException {
-		// TODO Auto-generated method stub
 		RandomAccessFile fout = openFile();
-		//byte[] writeByte = new byte[1];
-		//writeByte[0] = (byte) b;
-		//fout.write(writeByte);
-        fout.write(b);
-        fout.close();
-		pos++;
+		fout.write(b);
+		fout.close();
 	}
 
 }
