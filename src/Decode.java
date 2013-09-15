@@ -1,8 +1,6 @@
 import java.io.IOException;
-import java.util.ArrayList;
 
 import migratableProcess.MigratableProcess;
-
 import transactionalIO.TransactionalFileInputStream;
 import transactionalIO.TransactionalFileOutputStream;
 
