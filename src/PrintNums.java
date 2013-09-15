@@ -47,4 +47,10 @@ public class PrintNums extends MigratableProcess{
         }
     }
 
+	@Override
+	public String toString() {
+		System.out.println("Migratable Process-PrintNumbers");
+		return null;
+	}
+
 }

@@ -29,12 +29,11 @@ public class Encode extends MigratableProcess{
 			int a;
 			try {
 				a = inFile.read();
-
+				
 				if(a==-1) {
                     done = true;
                     break;
                 }
-
 				
 				String conv = Integer.toHexString(a);
 				byte[] b;
@@ -68,6 +67,12 @@ public class Encode extends MigratableProcess{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		System.out.println("Migratable Process: Encode   "+inFile.getFileName()+"     "+outFile.getFileName());
+		return null;
 	}
 
 }

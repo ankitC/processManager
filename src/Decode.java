@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 import migratableProcess.MigratableProcess;
 
@@ -67,6 +68,12 @@ public class Decode extends MigratableProcess {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	@Override
+	public String toString() {
+		System.out.println("Migratable Process: Decode   "+inFile.getFileName()+"     "+outFile.getFileName());
+		return null;
 	}
 
 
