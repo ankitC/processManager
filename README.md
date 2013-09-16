@@ -69,10 +69,12 @@ with a console. The following commands are available:
 We have provided three examples of migratable processes:
 	- Encode <infile> <outfile>
 		This process takes the input file and encodes each character into 
-		ASCII, writing the results into the specified output file. This encoded file can then be decoded by the the included Decode class mentioned below. 
+		ASCII, writing the results into the specified output file. 
+		This encoded file can then be decoded by the the included Decode class 
+		mentioned below. 
 	- Decode <infile> <outfile>
-		This process takes the input file and decodes each character as if it were ASCII, writing the results into the specified 
-		output file. 
+		This process takes the input file and decodes each character as if 
+		it were ASCII, writing the results into the specified output file. 
 	- PrintNums
 		This process simply prints the numbers 1 through 13 to stdout.
 
