@@ -1,9 +1,8 @@
-import java.io.IOException;
-
 import migratableProcess.MigratableProcess;
-
 import transactionalIO.TransactionalFileInputStream;
 import transactionalIO.TransactionalFileOutputStream;
+
+import java.io.IOException;
 
 public class Encode extends MigratableProcess{
 
@@ -42,7 +41,7 @@ public class Encode extends MigratableProcess{
 				for(int i=0; i<b.length;i++)
 					outFile.write((int)b[i]);
 				
-				Thread.sleep(3000);
+				Thread.sleep(300);
 
 
 			} catch (IOException e) {

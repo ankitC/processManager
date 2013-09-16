@@ -1,8 +1,8 @@
-import java.io.IOException;
-
 import migratableProcess.MigratableProcess;
 import transactionalIO.TransactionalFileInputStream;
 import transactionalIO.TransactionalFileOutputStream;
+
+import java.io.IOException;
 
 public class Decode extends MigratableProcess {
 	/**
@@ -42,7 +42,7 @@ public class Decode extends MigratableProcess {
 				int asciiLetter=Integer.parseInt(letter.toString(), 16) ;
 				outFile.write(asciiLetter);
 				
-				Thread.sleep(3000);
+				Thread.sleep(300);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
