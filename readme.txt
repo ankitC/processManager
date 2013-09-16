@@ -63,6 +63,8 @@ with a console. The following commands are available:
 		lists all available workers
 	- cmd ls ps
 		lists all unfinished processes
+	- help
+		lists all available commands
 	- exit
 		terminates the master along with all of its workers and processes
 
