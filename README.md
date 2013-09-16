@@ -45,6 +45,8 @@ Here, the parameters of interest are the server port and the serialization direc
 		same as running 
 			package.sh; execute.sh [master server name / IP]
 
+	These scripts MUST be run from the ROOT directory of the project.
+
 USING THE MASTER CONSOLE
 
 Once the master server instance has been started, you will be presented 
